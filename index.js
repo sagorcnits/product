@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 });
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri = `mongodb+srv://<${process.env.USER}>:<${process.env.PASSWORD}>@cluster.eer90zx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster`;
+const uri = `mongodb+srv://productHero:0FpPknYAMjKYkHZA@cluster.eer90zx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -24,23 +24,37 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const productCollection = client
-      .db("product-hero")
-      .collection("productCollection");
-
+    const productCollection = client.db("productHero").collection("products");
+    // product create
     app.post("/products", async (req, res) => {
-      try {
-        const product = req.body;
-        const result = await productCollection.insertOne(product);
+      const result = await productCollection.insertOne(req.body);
+      res.send(result);
+    });
+
+    // product get
+    app.get("/products", async (req, res) => {
+      const query = req.query;
+      if (!query.brand) {
+        const result = await productCollection.find().toArray();
         return res.send(result);
-      } catch {
-        return res.json({
-          success: false,
-          message: "Worng",
-        });
       }
+
+      console.log(query);
+    });
+
+    app.get("/products/:search", async (req, res) => {
+      const name = req.params.search;
+      const products = await productCollection.find().toArray();
+      const filterData = products.filter((item) => {
+        const matchProduct = item.product_name
+          .toLowerCase()
+          .includes(name.toLowerCase());
+        return matchProduct;
+      });
+      res.send(filterData);
     });
 
     await client.db("admin").command({ ping: 1 });
@@ -52,7 +66,7 @@ async function run() {
     // await client.close();
   }
 }
-run().catch(console.dir);
+run().catch(console.log);
 
 app.listen(port, () => {
   console.log("ok", port);
