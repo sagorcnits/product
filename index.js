@@ -39,12 +39,12 @@ async function run() {
       const query = req.query;
       if (!query.brand) {
         const result = await productCollection.find().toArray();
-        return res.send(result);
+        return res.send(result.slice(0, 8));
       }
 
       const price1 = query.price.split("-")[0];
       const price2 = query.price.split("-")[1];
-      console.log(price1, price2);
+      // console.log(price1, price2);
 
       const result = await productCollection
         .find({
@@ -68,6 +68,21 @@ async function run() {
 
     app.get("/products/:search", async (req, res) => {
       const name = req.params.search;
+
+      if (name === "Price Low to High") {
+        const products = await productCollection.find().toArray();
+        const result = products.sort((a, b) => a.price - b.price);
+        return res.send(result.slice(0, 8));
+      } else if (name === "Price High to Low") {
+        const products = await productCollection.find().toArray();
+        const result = products.sort((a, b) => b.price - a.price);
+        return res.send(result.slice(0, 8));
+      } else if (name === "Newest first") {
+        const products = await productCollection.find().toArray();
+        const result = products.sort((a, b) => b.date - a.date);
+        return res.send(result.slice(0, 8));
+      }
+
       const products = await productCollection.find().toArray();
       const filterData = products.filter((item) => {
         const matchProduct = item.product_name
