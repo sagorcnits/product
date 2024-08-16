@@ -42,7 +42,28 @@ async function run() {
         return res.send(result);
       }
 
+      const price1 = query.price.split("-")[0];
+      const price2 = query.price.split("-")[1];
+      console.log(price1, price2);
+
+      const result = await productCollection
+        .find({
+          $and: [
+            {
+              price: { $gte: price1, $lte: price2 },
+            },
+            {
+              category: query.category,
+            },
+
+            {
+              brand: query.brand,
+            },
+          ],
+        })
+        .toArray();
       console.log(query);
+      return res.send(result);
     });
 
     app.get("/products/:search", async (req, res) => {
