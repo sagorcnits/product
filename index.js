@@ -58,10 +58,9 @@ async function run() {
       const price1 = query.price.split("-")[0];
       const price2 = query.price.split("-")[1];
       // console.log(price1, price2);
-
       const result = await productCollection
         .find({
-          $and: [
+          $or: [
             {
               price: { $gte: price1, $lte: price2 },
             },
@@ -75,7 +74,7 @@ async function run() {
           ],
         })
         .toArray();
-      // console.log(query);
+      console.log(query);
       return res.send(result);
     });
 
