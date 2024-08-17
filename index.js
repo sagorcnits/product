@@ -109,6 +109,14 @@ async function run() {
       res.send(filterData);
     });
 
+    // app.put("/products/:id", async (req, res) => {
+    //   const query = { category: req.params.id };
+    //   const result = await productCollection.updateMany(query, {
+    //     $set: { rating: Math.floor(Math.random() * 100) },
+    //   });
+    //   res.send(result);
+    // });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
