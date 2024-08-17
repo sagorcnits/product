@@ -38,8 +38,16 @@ async function run() {
     app.get("/products", async (req, res) => {
       const query = req.query;
       if (query.size) {
-        const result = await productCollection.find().toArray();
-        return res.send(result.slice(0, query.size));
+        const page = parseInt(query.page);
+        const size = parseInt(query.size);
+        const skip = (page - 1) * size;
+
+        const result = await productCollection
+          .find()
+          .skip(skip)
+          .limit(size)
+          .toArray();
+        return res.send(result);
       }
 
       if (!query.brand) {
