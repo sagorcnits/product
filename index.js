@@ -37,9 +37,14 @@ async function run() {
     // product get
     app.get("/products", async (req, res) => {
       const query = req.query;
+      if (query.size) {
+        const result = await productCollection.find().toArray();
+        return res.send(result.slice(0, query.size));
+      }
+
       if (!query.brand) {
         const result = await productCollection.find().toArray();
-        return res.send(result.slice(0, 8));
+        return res.send(result);
       }
 
       const price1 = query.price.split("-")[0];
@@ -62,13 +67,13 @@ async function run() {
           ],
         })
         .toArray();
-      console.log(query);
+      // console.log(query);
       return res.send(result);
     });
 
     app.get("/products/:search", async (req, res) => {
       const name = req.params.search;
-
+      // console.log(name);
       if (name === "Price Low to High") {
         const products = await productCollection.find().toArray();
         const result = products.sort((a, b) => a.price - b.price);
@@ -79,7 +84,10 @@ async function run() {
         return res.send(result.slice(0, 8));
       } else if (name === "Newest first") {
         const products = await productCollection.find().toArray();
-        const result = products.sort((a, b) => b.date - a.date);
+
+        const result = products.sort(
+          (a, b) => b.date.replace(/\//g, "") - a.date.replace(/\//g, "")
+        );
         return res.send(result.slice(0, 8));
       }
 
