@@ -55,12 +55,30 @@ async function run() {
         return res.send(result);
       }
 
+      // const products = await productCollection.find().toArray();
+      // const result = products.filter((item) => {
+      //   if (
+      //     item.brand == query.brand ||
+      //     item.category == query.category ||
+      //     item.price >= query.minPrice ||
+      //     item.price <= query.maxPrice
+      //   ) {
+      //     // console.log(ite);
+      //     return true;
+      //   }
+      // });
+
+      // console.log(query);
+
+      // return res.send(result.slice(0, 8));
+
       const price1 = query.price.split("-")[0];
       const price2 = query.price.split("-")[1];
       // console.log(price1, price2);
+
       const result = await productCollection
         .find({
-          $or: [
+          $and: [
             {
               price: { $gte: price1, $lte: price2 },
             },
@@ -74,7 +92,7 @@ async function run() {
           ],
         })
         .toArray();
-      console.log(query);
+      // console.log(query);
       return res.send(result);
     });
 
